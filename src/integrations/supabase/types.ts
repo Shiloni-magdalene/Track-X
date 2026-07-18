@@ -14,7 +14,425 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      aptitude: {
+        Row: {
+          accuracy: number
+          category: string
+          created_at: string
+          difficulty: string | null
+          id: string
+          last_practiced: string | null
+          notes: string | null
+          progress_percent: number
+          questions_solved: number
+          revision_due: string | null
+          time_per_question: number
+          topic: string
+          updated_at: string
+          user_id: string
+          weakness_level: string | null
+        }
+        Insert: {
+          accuracy?: number
+          category: string
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_practiced?: string | null
+          notes?: string | null
+          progress_percent?: number
+          questions_solved?: number
+          revision_due?: string | null
+          time_per_question?: number
+          topic: string
+          updated_at?: string
+          user_id: string
+          weakness_level?: string | null
+        }
+        Update: {
+          accuracy?: number
+          category?: string
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_practiced?: string | null
+          notes?: string | null
+          progress_percent?: number
+          questions_solved?: number
+          revision_due?: string | null
+          time_per_question?: number
+          topic?: string
+          updated_at?: string
+          user_id?: string
+          weakness_level?: string | null
+        }
+        Relationships: []
+      }
+      aptitude_mocks: {
+        Row: {
+          accuracy: number
+          created_at: string
+          date: string
+          id: string
+          improvement_suggestions: string | null
+          logical_score: number
+          mistakes: Json
+          quant_score: number
+          time_taken: number | null
+          total_score: number
+          updated_at: string
+          user_id: string
+          verbal_score: number
+        }
+        Insert: {
+          accuracy?: number
+          created_at?: string
+          date?: string
+          id?: string
+          improvement_suggestions?: string | null
+          logical_score?: number
+          mistakes?: Json
+          quant_score?: number
+          time_taken?: number | null
+          total_score?: number
+          updated_at?: string
+          user_id: string
+          verbal_score?: number
+        }
+        Update: {
+          accuracy?: number
+          created_at?: string
+          date?: string
+          id?: string
+          improvement_suggestions?: string | null
+          logical_score?: number
+          mistakes?: Json
+          quant_score?: number
+          time_taken?: number | null
+          total_score?: number
+          updated_at?: string
+          user_id?: string
+          verbal_score?: number
+        }
+        Relationships: []
+      }
+      certificates: {
+        Row: {
+          created_at: string
+          date: string | null
+          id: string
+          linkedin_posted: boolean
+          name: string
+          platform: string | null
+          resume_added: boolean
+          skills_learned: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string | null
+          id?: string
+          linkedin_posted?: boolean
+          name: string
+          platform?: string | null
+          resume_added?: boolean
+          skills_learned?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string | null
+          id?: string
+          linkedin_posted?: boolean
+          name?: string
+          platform?: string | null
+          resume_added?: boolean
+          skills_learned?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      exams: {
+        Row: {
+          created_at: string
+          date: string | null
+          end_sem_data: Json
+          id: string
+          marks: number | null
+          practical_data: Json
+          revision_percent: number
+          subject_id: string | null
+          syllabus_covered: number
+          target_marks: number | null
+          type: string
+          updated_at: string
+          user_id: string
+          weak_topics: Json
+        }
+        Insert: {
+          created_at?: string
+          date?: string | null
+          end_sem_data?: Json
+          id?: string
+          marks?: number | null
+          practical_data?: Json
+          revision_percent?: number
+          subject_id?: string | null
+          syllabus_covered?: number
+          target_marks?: number | null
+          type: string
+          updated_at?: string
+          user_id: string
+          weak_topics?: Json
+        }
+        Update: {
+          created_at?: string
+          date?: string | null
+          end_sem_data?: Json
+          id?: string
+          marks?: number | null
+          practical_data?: Json
+          revision_percent?: number
+          subject_id?: string | null
+          syllabus_covered?: number
+          target_marks?: number | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+          weak_topics?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exams_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leetcode: {
+        Row: {
+          created_at: string
+          difficulty: string | null
+          id: string
+          notes: string | null
+          problem_name: string
+          revision_needed: boolean
+          solved_date: string | null
+          topic: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          notes?: string | null
+          problem_name: string
+          revision_needed?: boolean
+          solved_date?: string | null
+          topic?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          notes?: string | null
+          problem_name?: string
+          revision_needed?: boolean
+          solved_date?: string | null
+          topic?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      linkedin_tracker: {
+        Row: {
+          created_at: string
+          engagement: Json
+          id: string
+          next_post_idea: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          engagement?: Json
+          id?: string
+          next_post_idea?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          engagement?: Json
+          id?: string
+          next_post_idea?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          ai_insights_cache: Json
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          overall_academic_progress: number
+          overall_placement_readiness: number
+          updated_at: string
+        }
+        Insert: {
+          ai_insights_cache?: Json
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          overall_academic_progress?: number
+          overall_placement_readiness?: number
+          updated_at?: string
+        }
+        Update: {
+          ai_insights_cache?: Json
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          overall_academic_progress?: number
+          overall_placement_readiness?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          deadline: string | null
+          doc_progress: number
+          github_link: string | null
+          id: string
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deadline?: string | null
+          doc_progress?: number
+          github_link?: string | null
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deadline?: string | null
+          doc_progress?: number
+          github_link?: string | null
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          category: string
+          confidence: number
+          created_at: string
+          hours_studied: number
+          id: string
+          last_updated: string
+          learning_percent: number
+          name: string
+          practice_questions: number
+          projects_built: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          confidence?: number
+          created_at?: string
+          hours_studied?: number
+          id?: string
+          last_updated?: string
+          learning_percent?: number
+          name: string
+          practice_questions?: number
+          projects_built?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          confidence?: number
+          created_at?: string
+          hours_studied?: number
+          id?: string
+          last_updated?: string
+          learning_percent?: number
+          name?: string
+          practice_questions?: number
+          projects_built?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subjects: {
+        Row: {
+          assignment: Json
+          created_at: string
+          credits: number
+          id: string
+          name: string
+          project: Json
+          study_plan: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assignment?: Json
+          created_at?: string
+          credits?: number
+          id?: string
+          name: string
+          project?: Json
+          study_plan?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assignment?: Json
+          created_at?: string
+          credits?: number
+          id?: string
+          name?: string
+          project?: Json
+          study_plan?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
