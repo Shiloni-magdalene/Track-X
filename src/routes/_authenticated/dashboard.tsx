@@ -108,7 +108,7 @@ const upcomingDeadlines = [
 
 const upcomingExams = [
   { id: "e1", subject: "DBMS", type: "CAT" as const, date: "Jul 22", daysLeft: 4 },
-  { id: "e2", subject: "Operating Systems", type: "Unit Test" as const, date: "Jul 25", daysLeft: 7 },
+  { id: "e2", subject: "maths", type: "Unit Test" as const, date: "Jul 25", daysLeft: 7 },
   { id: "e3", subject: "Physics Lab", type: "Practical" as const, date: "Jul 28", daysLeft: 10 },
   { id: "e4", subject: "Data Structures", type: "EndSem" as const, date: "Aug 05", daysLeft: 18 },
 ];
