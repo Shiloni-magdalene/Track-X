@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Brain, Calculator, MessageSquare, Puzzle, ChevronDown, Clock, Target, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import type { AptitudeCategory } from "@/lib/types";
 
@@ -166,8 +165,8 @@ function AptitudePage() {
                 const total = m.quant + m.logical + m.verbal;
                 const isOpen = openMock === m.id;
                 return (
-                  <>
-                    <TableRow key={m.id} className="cursor-pointer" onClick={() => setOpenMock(isOpen ? null : m.id)}>
+                  <Fragment key={m.id}>
+                    <TableRow className="cursor-pointer" onClick={() => setOpenMock(isOpen ? null : m.id)}>
                       <TableCell className="font-medium">{new Date(m.date).toLocaleDateString()}</TableCell>
                       <TableCell>{m.quant}</TableCell>
                       <TableCell>{m.logical}</TableCell>
@@ -183,7 +182,7 @@ function AptitudePage() {
                       </TableCell>
                     </TableRow>
                     {isOpen && (
-                      <TableRow key={`${m.id}-detail`} className="bg-muted/30">
+                      <TableRow className="bg-muted/30">
                         <TableCell colSpan={7} className="p-4">
                           <div className="grid gap-4 md:grid-cols-2">
                             <div>
@@ -204,7 +203,7 @@ function AptitudePage() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </TableBody>
