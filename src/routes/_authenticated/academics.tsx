@@ -1,500 +1,378 @@
-import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { format } from "date-fns";
 import {
-  BookOpen,
-  CalendarDays,
-  ClipboardList,
-  FolderKanban,
-  GraduationCap,
-  ListChecks,
-  Target,
+  BookOpen, CalendarDays, ClipboardList, FolderKanban, GraduationCap, ListChecks,
+  Loader2, Plus, Trash2, CalendarIcon,
 } from "lucide-react";
+import { toast } from "sonner";
+
+import { supabase } from "@/integrations/supabase/client";
+import type { Subject, StudyPlanItem } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import type {
-  StudyPlanItem,
-  SubjectAssignment,
-  SubjectProject,
-} from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/academics")({
   head: () => ({ meta: [{ title: "Academics — Scholar OS" }] }),
   component: AcademicsPage,
 });
 
-// ---------- Placeholder data (matches shapes in src/lib/types.ts) ----------
-
-type SubjectCard = {
-  id: string;
-  name: string;
-  code: string;
-  credits: number;
-  color: string;
-  study_plan: StudyPlanItem[];
-  assignment: SubjectAssignment & { title: string };
-  project: SubjectProject & { title: string };
-};
-
-const subjects: SubjectCard[] = [
-  {
-    id: "1",
-    name: "Database Management Systems",
-    code: "CS-301",
-    credits: 4,
-    color: "from-indigo-500/20 to-violet-500/20",
-    study_plan: [
-      { topic: "ER Model & Relational Design", questionsStudied: 42, totalQuestions: 50 },
-      { topic: "SQL & Joins", questionsStudied: 58, totalQuestions: 60 },
-      { topic: "Normalization (1NF–BCNF)", questionsStudied: 18, totalQuestions: 40 },
-      { topic: "Transactions & Concurrency", questionsStudied: 12, totalQuestions: 45 },
-      { topic: "Indexing & Query Optimization", questionsStudied: 6, totalQuestions: 30 },
-    ],
-    assignment: {
-      title: "Assignment 3 — Normalization Case Study",
-      progress: 65,
-      deadline: "2026-07-24",
-      status: "in_progress",
-    },
-    project: {
-      title: "Mini Project — Library DB",
-      componentsRequired: [
-        "ER diagram",
-        "Schema (3NF)",
-        "SQL scripts",
-        "Stored procedures",
-        "Report (10 pg)",
-      ],
-      reportProgress: 40,
-      deadline: "2026-08-02",
-      status: "in_progress",
-    },
-  },
-  {
-    id: "2",
-    name: "Operating Systems",
-    code: "CS-302",
-    credits: 4,
-    color: "from-emerald-500/20 to-teal-500/20",
-    study_plan: [
-      { topic: "Processes & Threads", questionsStudied: 32, totalQuestions: 40 },
-      { topic: "CPU Scheduling", questionsStudied: 24, totalQuestions: 35 },
-      { topic: "Memory Management", questionsStudied: 14, totalQuestions: 40 },
-      { topic: "Deadlocks", questionsStudied: 10, totalQuestions: 25 },
-      { topic: "File Systems", questionsStudied: 4, totalQuestions: 20 },
-    ],
-    assignment: {
-      title: "Assignment 2 — Scheduling Simulator",
-      progress: 30,
-      deadline: "2026-07-28",
-      status: "in_progress",
-    },
-    project: {
-      title: "Shell Implementation in C",
-      componentsRequired: [
-        "Command parser",
-        "Pipes & redirection",
-        "Background jobs",
-        "Signal handling",
-        "Report",
-      ],
-      reportProgress: 20,
-      deadline: "2026-08-10",
-      status: "in_progress",
-    },
-  },
-  {
-    id: "3",
-    name: "Computer Networks",
-    code: "CS-303",
-    credits: 3,
-    color: "from-sky-500/20 to-cyan-500/20",
-    study_plan: [
-      { topic: "OSI & TCP/IP", questionsStudied: 28, totalQuestions: 30 },
-      { topic: "Data Link Layer", questionsStudied: 20, totalQuestions: 30 },
-      { topic: "Routing Algorithms", questionsStudied: 12, totalQuestions: 30 },
-      { topic: "Transport Layer (TCP/UDP)", questionsStudied: 22, totalQuestions: 35 },
-      { topic: "Application Layer", questionsStudied: 8, totalQuestions: 25 },
-    ],
-    assignment: {
-      title: "Assignment 1 — Subnetting Worksheet",
-      progress: 100,
-      deadline: "2026-07-15",
-      status: "submitted",
-    },
-    project: {
-      title: "Packet Sniffer (Python)",
-      componentsRequired: ["Raw sockets", "Protocol parsing", "UI dashboard", "Report"],
-      reportProgress: 55,
-      deadline: "2026-08-05",
-      status: "in_progress",
-    },
-  },
-  {
-    id: "4",
-    name: "Discrete Mathematics",
-    code: "MA-201",
-    credits: 3,
-    color: "from-amber-500/20 to-orange-500/20",
-    study_plan: [
-      { topic: "Set Theory & Logic", questionsStudied: 40, totalQuestions: 45 },
-      { topic: "Combinatorics", questionsStudied: 26, totalQuestions: 40 },
-      { topic: "Graph Theory", questionsStudied: 18, totalQuestions: 35 },
-      { topic: "Recurrence Relations", questionsStudied: 8, totalQuestions: 25 },
-    ],
-    assignment: {
-      title: "Assignment 3 — Graph Coloring Problems",
-      progress: 45,
-      deadline: "2026-07-26",
-      status: "in_progress",
-    },
-    project: {
-      title: "Graph Algorithm Visualizer",
-      componentsRequired: ["BFS/DFS", "Dijkstra", "MST", "UI", "Report"],
-      reportProgress: 25,
-      deadline: "2026-08-15",
-      status: "in_progress",
-    },
-  },
-  {
-    id: "5",
-    name: "Software Engineering",
-    code: "CS-304",
-    credits: 3,
-    color: "from-rose-500/20 to-pink-500/20",
-    study_plan: [
-      { topic: "SDLC Models", questionsStudied: 20, totalQuestions: 25 },
-      { topic: "Requirements Engineering", questionsStudied: 16, totalQuestions: 25 },
-      { topic: "UML & Design", questionsStudied: 22, totalQuestions: 30 },
-      { topic: "Testing Strategies", questionsStudied: 10, totalQuestions: 30 },
-    ],
-    assignment: {
-      title: "Assignment 2 — SRS Document",
-      progress: 80,
-      deadline: "2026-07-22",
-      status: "in_progress",
-    },
-    project: {
-      title: "Team Project — Task Manager App",
-      componentsRequired: ["SRS", "Design docs", "Code", "Test plan", "Final report"],
-      reportProgress: 60,
-      deadline: "2026-08-20",
-      status: "in_progress",
-    },
-  },
-  {
-    id: "6",
-    name: "Machine Learning",
-    code: "CS-401",
-    credits: 4,
-    color: "from-fuchsia-500/20 to-purple-500/20",
-    study_plan: [
-      { topic: "Regression", questionsStudied: 25, totalQuestions: 30 },
-      { topic: "Classification", questionsStudied: 20, totalQuestions: 35 },
-      { topic: "Neural Networks", questionsStudied: 8, totalQuestions: 40 },
-      { topic: "Unsupervised Learning", questionsStudied: 5, totalQuestions: 25 },
-    ],
-    assignment: {
-      title: "Assignment 1 — Linear Regression from Scratch",
-      progress: 55,
-      deadline: "2026-07-30",
-      status: "in_progress",
-    },
-    project: {
-      title: "Image Classifier (CNN)",
-      componentsRequired: ["Dataset prep", "Model", "Training", "Evaluation", "Report"],
-      reportProgress: 15,
-      deadline: "2026-08-25",
-      status: "planned" as never,
-    },
-  },
-];
-
-// ---------- Helpers ----------
-
-function subjectProgress(s: SubjectCard) {
-  const totals = s.study_plan.reduce(
-    (acc, t) => {
-      acc.studied += t.questionsStudied;
-      acc.total += t.totalQuestions;
-      return acc;
-    },
-    { studied: 0, total: 0 },
-  );
-  return totals.total ? Math.round((totals.studied / totals.total) * 100) : 0;
+function subjectProgress(s: Subject) {
+  const sp = (Array.isArray(s.study_plan) ? s.study_plan : []) as StudyPlanItem[];
+  const t = sp.reduce((a, x) => ({ studied: a.studied + (x.questionsStudied || 0), total: a.total + (x.totalQuestions || 0) }), { studied: 0, total: 0 });
+  return t.total ? Math.round((t.studied / t.total) * 100) : 0;
 }
-
-function statusBadge(status?: string) {
-  const map: Record<string, { label: string; className: string }> = {
-    not_started: { label: "Not started", className: "bg-muted text-muted-foreground" },
-    planned: { label: "Planned", className: "bg-muted text-muted-foreground" },
-    in_progress: {
-      label: "In progress",
-      className: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-    },
-    submitted: {
-      label: "Submitted",
-      className: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-    },
-    graded: {
-      label: "Graded",
-      className: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
-    },
-  };
-  const s = map[status ?? "not_started"] ?? map.not_started;
-  return <Badge className={cn("font-medium", s.className)}>{s.label}</Badge>;
-}
-
-function formatDate(d?: string | null) {
-  if (!d) return "—";
-  return new Date(d).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 function daysUntil(d?: string | null) {
   if (!d) return null;
-  const diff = Math.ceil((new Date(d).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  return diff;
+  return Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
 }
 
-// ---------- Page ----------
-
 function AcademicsPage() {
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
-  const active = useMemo(() => subjects.find((s) => s.id === openId) ?? null, [openId]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", credits: 3 });
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    const { data, error } = await supabase.from("subjects").select("*").order("created_at", { ascending: false });
+    if (error) toast.error(error.message);
+    else setSubjects((data ?? []) as unknown as Subject[]);
+    setLoading(false);
+  };
+  useEffect(() => { void load(); }, []);
+  useEffect(() => { if (addOpen) setForm({ name: "", credits: 3 }); }, [addOpen]);
+
+  const active = useMemo(() => subjects.find((s) => s.id === openId) ?? null, [subjects, openId]);
+
+  const submitAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim()) { toast.error("Subject name required"); return; }
+    setSaving(true);
+    const { data: userData } = await supabase.auth.getUser();
+    const uid = userData.user?.id;
+    if (!uid) { toast.error("Not signed in"); setSaving(false); return; }
+    const { error } = await supabase.from("subjects").insert({
+      user_id: uid, name: form.name.trim(), credits: form.credits,
+      study_plan: [], assignment: {}, project: {},
+    });
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Subject added");
+    setAddOpen(false); void load();
+  };
+
+  const removeSubject = async (id: string) => {
+    const { error } = await supabase.from("subjects").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Subject removed"); setOpenId(null); void load(); }
+  };
 
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            <GraduationCap className="h-6 w-6 text-primary" />
-            Academics
+            <GraduationCap className="h-6 w-6 text-primary" /> Academics
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Your subjects, study plans, assignments and projects — all in one view.
-          </p>
+          <p className="text-sm text-muted-foreground">Your subjects, study plans, assignments, and projects.</p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-          <Badge variant="secondary">{subjects.length} subjects</Badge>
-          <Badge variant="secondary">
-            {subjects.reduce((n, s) => n + s.credits, 0)} credits this sem
-          </Badge>
-        </div>
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" /> Add Subject</Button></DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Add Subject</DialogTitle><DialogDescription>Add a new subject to track.</DialogDescription></DialogHeader>
+            <form onSubmit={submitAdd} className="space-y-4">
+              <div className="space-y-2"><Label>Subject Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
+              <div className="space-y-2"><Label>Credits</Label><Input type="number" min={0} value={form.credits} onChange={(e) => setForm({ ...form, credits: +e.target.value })} /></div>
+              <DialogFooter>
+                <Button type="button" variant="ghost" onClick={() => setAddOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={saving}>{saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Add</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </header>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {subjects.map((s) => {
-          const progress = subjectProgress(s);
-          const dueSoon = daysUntil(s.assignment.deadline);
-          return (
-            <button
-              key={s.id}
-              onClick={() => setOpenId(s.id)}
-              className="group text-left"
-            >
-              <Card className="relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-primary/40">
-                <div
-                  className={cn(
-                    "absolute inset-0 bg-gradient-to-br opacity-60 pointer-events-none",
-                    s.color,
-                  )}
-                />
-                <CardHeader className="relative">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <CardDescription className="text-xs font-mono">{s.code}</CardDescription>
+      {loading ? (
+        <div className="flex justify-center py-16 text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin" /></div>
+      ) : subjects.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="py-12 text-center space-y-3">
+            <GraduationCap className="h-10 w-10 mx-auto text-muted-foreground" />
+            <p className="font-medium">No subjects added yet</p>
+            <p className="text-sm text-muted-foreground">Click "Add Subject" to start tracking your coursework.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {subjects.map((s) => {
+            const progress = subjectProgress(s);
+            const asg = (s.assignment ?? {}) as any;
+            const dueSoon = daysUntil(asg.deadline);
+            return (
+              <button key={s.id} onClick={() => setOpenId(s.id)} className="group text-left">
+                <Card className="relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-primary/40">
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-lg leading-tight">{s.name}</CardTitle>
+                      <Badge variant="outline" className="shrink-0">{s.credits} cr</Badge>
                     </div>
-                    <Badge variant="outline" className="shrink-0 bg-background/60 backdrop-blur">
-                      {s.credits} cr
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="relative space-y-4">
-                  <div>
-                    <div className="mb-1 flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Study plan</span>
-                      <span className="font-semibold">{progress}%</span>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <div className="mb-1 flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Study plan</span>
+                        <span className="font-semibold">{progress}%</span>
+                      </div>
+                      <Progress value={progress} className="h-2" />
                     </div>
-                    <Progress value={progress} className="h-2" />
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <ClipboardList className="h-3.5 w-3.5" />
-                      Assignment {s.assignment.progress ?? 0}%
-                    </span>
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1",
-                        dueSoon !== null && dueSoon <= 3 && "text-destructive font-medium",
-                      )}
-                    >
-                      <CalendarDays className="h-3.5 w-3.5" />
-                      {dueSoon === null
-                        ? "—"
-                        : dueSoon < 0
-                          ? "Overdue"
-                          : dueSoon === 0
-                            ? "Due today"
-                            : `${dueSoon}d left`}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </button>
-          );
-        })}
-      </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <ClipboardList className="h-3.5 w-3.5" /> Assignment {asg.progress ?? 0}%
+                      </span>
+                      <span className={cn("inline-flex items-center gap-1", dueSoon !== null && dueSoon <= 3 && "text-destructive font-medium")}>
+                        <CalendarDays className="h-3.5 w-3.5" />
+                        {dueSoon === null ? "—" : dueSoon < 0 ? "Overdue" : dueSoon === 0 ? "Due today" : `${dueSoon}d left`}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <Dialog open={!!active} onOpenChange={(o) => !o && setOpenId(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           {active && (
-            <>
-              <DialogHeader>
-                <DialogDescription className="font-mono text-xs">
-                  {active.code} · {active.credits} credits
-                </DialogDescription>
-                <DialogTitle className="text-xl">{active.name}</DialogTitle>
-              </DialogHeader>
-
-              <Tabs defaultValue="study" className="mt-2">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="study">
-                    <BookOpen className="mr-1.5 h-4 w-4" /> Study Plan
-                  </TabsTrigger>
-                  <TabsTrigger value="assign">
-                    <ClipboardList className="mr-1.5 h-4 w-4" /> Assignments
-                  </TabsTrigger>
-                  <TabsTrigger value="project">
-                    <FolderKanban className="mr-1.5 h-4 w-4" /> Projects
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="study" className="mt-4 space-y-4">
-                  {active.study_plan.map((t) => {
-                    const pct = t.totalQuestions
-                      ? Math.round((t.questionsStudied / t.totalQuestions) * 100)
-                      : 0;
-                    return (
-                      <div key={t.topic} className="space-y-1.5">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium">{t.topic}</span>
-                          <span className="text-muted-foreground">
-                            {t.questionsStudied}/{t.totalQuestions} ·{" "}
-                            <span className="font-semibold text-foreground">{pct}%</span>
-                          </span>
-                        </div>
-                        <Progress value={pct} className="h-2" />
-                      </div>
-                    );
-                  })}
-                </TabsContent>
-
-                <TabsContent value="assign" className="mt-4 space-y-4">
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="text-base">{active.assignment.title}</CardTitle>
-                        {statusBadge(active.assignment.status)}
-                      </div>
-                      <CardDescription className="inline-flex items-center gap-1">
-                        <CalendarDays className="h-3.5 w-3.5" />
-                        Due {formatDate(active.assignment.deadline)}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-semibold">
-                          {active.assignment.progress ?? 0}%
-                        </span>
-                      </div>
-                      <Progress value={active.assignment.progress ?? 0} className="h-2" />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                <TabsContent value="project" className="mt-4 space-y-4">
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="text-base">{active.project.title}</CardTitle>
-                        {statusBadge(active.project.status)}
-                      </div>
-                      <CardDescription className="inline-flex items-center gap-1">
-                        <CalendarDays className="h-3.5 w-3.5" />
-                        Due {formatDate(active.project.deadline)}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <div className="mb-2 flex items-center gap-2 text-sm font-medium">
-                          <ListChecks className="h-4 w-4 text-primary" />
-                          Required components
-                        </div>
-                        <ul className="space-y-2">
-                          {(active.project.componentsRequired ?? []).map((c, i) => (
-                            <li key={c} className="flex items-center gap-2 text-sm">
-                              <Checkbox
-                                id={`c-${i}`}
-                                defaultChecked={
-                                  i <
-                                  Math.floor(
-                                    ((active.project.reportProgress ?? 0) / 100) *
-                                      (active.project.componentsRequired?.length ?? 0),
-                                  )
-                                }
-                              />
-                              <label htmlFor={`c-${i}`} className="cursor-pointer">
-                                {c}
-                              </label>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                          <span className="inline-flex items-center gap-1 text-muted-foreground">
-                            <Target className="h-3.5 w-3.5" /> Report prep
-                          </span>
-                          <span className="font-semibold">
-                            {active.project.reportProgress ?? 0}%
-                          </span>
-                        </div>
-                        <Progress
-                          value={active.project.reportProgress ?? 0}
-                          className="h-2"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </>
+            <SubjectDetail
+              subject={active}
+              onChanged={load}
+              onDelete={() => removeSubject(active.id)}
+            />
           )}
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function SubjectDetail({ subject, onChanged, onDelete }: { subject: Subject; onChanged: () => void; onDelete: () => void }) {
+  const study = (Array.isArray(subject.study_plan) ? subject.study_plan : []) as StudyPlanItem[];
+  const asg = (subject.assignment ?? {}) as any;
+  const proj = (subject.project ?? {}) as any;
+
+  const [newTopic, setNewTopic] = useState({ topic: "", questionsStudied: 0, totalQuestions: 0 });
+  const [asgForm, setAsgForm] = useState({
+    title: asg.title ?? "",
+    progress: asg.progress ?? 0,
+    deadline: asg.deadline ? new Date(asg.deadline) : (undefined as Date | undefined),
+    status: asg.status ?? "not_started",
+  });
+  const [projForm, setProjForm] = useState({
+    title: proj.title ?? "",
+    componentsRequired: (proj.componentsRequired ?? []) as string[],
+    newComponent: "",
+    reportProgress: proj.reportProgress ?? 0,
+    deadline: proj.deadline ? new Date(proj.deadline) : (undefined as Date | undefined),
+    status: proj.status ?? "not_started",
+  });
+  const [saving, setSaving] = useState(false);
+
+  const patch = async (payload: Partial<Subject>) => {
+    setSaving(true);
+    const { error } = await supabase.from("subjects").update(payload as any).eq("id", subject.id);
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    onChanged();
+  };
+
+  const addTopic = async () => {
+    if (!newTopic.topic.trim()) { toast.error("Topic name required"); return; }
+    const next = [...study, { ...newTopic, topic: newTopic.topic.trim() }];
+    await patch({ study_plan: next as any });
+    setNewTopic({ topic: "", questionsStudied: 0, totalQuestions: 0 });
+    toast.success("Topic added");
+  };
+  const removeTopic = async (i: number) => {
+    const next = study.filter((_, idx) => idx !== i);
+    await patch({ study_plan: next as any });
+  };
+  const updateTopicStudied = async (i: number, val: number) => {
+    const next = study.map((t, idx) => idx === i ? { ...t, questionsStudied: val } : t);
+    await patch({ study_plan: next as any });
+  };
+
+  const saveAssignment = async () => {
+    await patch({ assignment: {
+      title: asgForm.title,
+      progress: asgForm.progress,
+      deadline: asgForm.deadline ? format(asgForm.deadline, "yyyy-MM-dd") : null,
+      status: asgForm.status,
+    } as any });
+    toast.success("Assignment saved");
+  };
+  const saveProject = async () => {
+    await patch({ project: {
+      title: projForm.title,
+      componentsRequired: projForm.componentsRequired,
+      reportProgress: projForm.reportProgress,
+      deadline: projForm.deadline ? format(projForm.deadline, "yyyy-MM-dd") : null,
+      status: projForm.status,
+    } as any });
+    toast.success("Project saved");
+  };
+  const addComponent = () => {
+    if (!projForm.newComponent.trim()) return;
+    setProjForm({ ...projForm, componentsRequired: [...projForm.componentsRequired, projForm.newComponent.trim()], newComponent: "" });
+  };
+  const removeComponent = (i: number) => {
+    setProjForm({ ...projForm, componentsRequired: projForm.componentsRequired.filter((_, idx) => idx !== i) });
+  };
+
+  return (
+    <>
+      <DialogHeader>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <DialogDescription>{subject.credits} credits</DialogDescription>
+            <DialogTitle className="text-xl">{subject.name}</DialogTitle>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onDelete} className="text-destructive hover:text-destructive">
+            <Trash2 className="h-4 w-4 mr-1" /> Delete
+          </Button>
+        </div>
+      </DialogHeader>
+
+      <Tabs defaultValue="study" className="mt-2">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="study"><BookOpen className="mr-1.5 h-4 w-4" /> Study Plan</TabsTrigger>
+          <TabsTrigger value="assign"><ClipboardList className="mr-1.5 h-4 w-4" /> Assignment</TabsTrigger>
+          <TabsTrigger value="project"><FolderKanban className="mr-1.5 h-4 w-4" /> Project</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="study" className="mt-4 space-y-4">
+          {study.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No topics yet. Add one below.</p>}
+          {study.map((t, i) => {
+            const pct = t.totalQuestions ? Math.round((t.questionsStudied / t.totalQuestions) * 100) : 0;
+            return (
+              <div key={i} className="space-y-1.5 rounded-md border p-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium">{t.topic}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">{t.questionsStudied}/{t.totalQuestions} · <b>{pct}%</b></span>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeTopic(i)}><Trash2 className="h-3 w-3" /></Button>
+                  </div>
+                </div>
+                <Progress value={pct} className="h-2" />
+                <Slider value={[t.questionsStudied]} min={0} max={t.totalQuestions || 1} step={1} onValueCommit={(v) => updateTopicStudied(i, v[0])} />
+              </div>
+            );
+          })}
+          <div className="rounded-md border border-dashed p-3 space-y-2">
+            <p className="text-sm font-medium">Add Topic</p>
+            <Input placeholder="Topic name" value={newTopic.topic} onChange={(e) => setNewTopic({ ...newTopic, topic: e.target.value })} />
+            <div className="grid gap-2 grid-cols-2">
+              <Input type="number" placeholder="Studied" value={newTopic.questionsStudied} onChange={(e) => setNewTopic({ ...newTopic, questionsStudied: +e.target.value })} />
+              <Input type="number" placeholder="Total questions" value={newTopic.totalQuestions} onChange={(e) => setNewTopic({ ...newTopic, totalQuestions: +e.target.value })} />
+            </div>
+            <Button size="sm" onClick={addTopic} disabled={saving}><Plus className="h-4 w-4 mr-1" /> Add Topic</Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="assign" className="mt-4 space-y-3">
+          <div className="space-y-2"><Label>Assignment Title</Label><Input value={asgForm.title} onChange={(e) => setAsgForm({ ...asgForm, title: e.target.value })} /></div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Deadline</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="outline" className={cn("w-full justify-start text-left font-normal", !asgForm.deadline && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />{asgForm.deadline ? format(asgForm.deadline, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0"><Calendar mode="single" selected={asgForm.deadline} onSelect={(d) => setAsgForm({ ...asgForm, deadline: d })} initialFocus className="p-3 pointer-events-auto" /></PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-2"><Label>Status</Label>
+              <select className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                value={asgForm.status} onChange={(e) => setAsgForm({ ...asgForm, status: e.target.value as any })}>
+                <option value="not_started">Not started</option>
+                <option value="in_progress">In progress</option>
+                <option value="submitted">Submitted</option>
+                <option value="graded">Graded</option>
+              </select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between"><Label>Progress</Label><span className="text-sm font-medium">{asgForm.progress}%</span></div>
+            <Slider value={[asgForm.progress]} min={0} max={100} step={5} onValueChange={(v) => setAsgForm({ ...asgForm, progress: v[0] })} />
+          </div>
+          <Button onClick={saveAssignment} disabled={saving}>{saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Save Assignment</Button>
+        </TabsContent>
+
+        <TabsContent value="project" className="mt-4 space-y-3">
+          <div className="space-y-2"><Label>Project Title</Label><Input value={projForm.title} onChange={(e) => setProjForm({ ...projForm, title: e.target.value })} /></div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Deadline</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="outline" className={cn("w-full justify-start text-left font-normal", !projForm.deadline && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />{projForm.deadline ? format(projForm.deadline, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0"><Calendar mode="single" selected={projForm.deadline} onSelect={(d) => setProjForm({ ...projForm, deadline: d })} initialFocus className="p-3 pointer-events-auto" /></PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-2"><Label>Status</Label>
+              <select className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                value={projForm.status} onChange={(e) => setProjForm({ ...projForm, status: e.target.value as any })}>
+                <option value="not_started">Not started</option>
+                <option value="in_progress">In progress</option>
+                <option value="submitted">Submitted</option>
+                <option value="graded">Graded</option>
+              </select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5"><ListChecks className="h-4 w-4" /> Required Components</Label>
+            {projForm.componentsRequired.length === 0 && <p className="text-xs text-muted-foreground">None yet.</p>}
+            <ul className="space-y-1">
+              {projForm.componentsRequired.map((c, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <span className="flex-1">{c}</span>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeComponent(i)}><Trash2 className="h-3 w-3" /></Button>
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2">
+              <Input placeholder="Component" value={projForm.newComponent} onChange={(e) => setProjForm({ ...projForm, newComponent: e.target.value })} />
+              <Button type="button" variant="outline" onClick={addComponent}><Plus className="h-4 w-4" /></Button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between"><Label>Report progress</Label><span className="text-sm font-medium">{projForm.reportProgress}%</span></div>
+            <Slider value={[projForm.reportProgress]} min={0} max={100} step={5} onValueChange={(v) => setProjForm({ ...projForm, reportProgress: v[0] })} />
+          </div>
+          <Button onClick={saveProject} disabled={saving}>{saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Save Project</Button>
+        </TabsContent>
+      </Tabs>
+    </>
   );
 }
