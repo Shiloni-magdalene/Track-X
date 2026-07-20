@@ -149,7 +149,8 @@ function CertificatesSection() {
     toast.success("Certificate added"); setOpen(false); void load();
   };
   const toggle = async (c: Certificate, field: "resume_added" | "linkedin_posted") => {
-    const { error } = await supabase.from("certificates").update({ [field]: !c[field] }).eq("id", c.id);
+    const patch = field === "resume_added" ? { resume_added: !c.resume_added } : { linkedin_posted: !c.linkedin_posted };
+    const { error } = await supabase.from("certificates").update(patch).eq("id", c.id);
     if (error) toast.error(error.message); else void load();
   };
   const remove = async (id: string) => {
