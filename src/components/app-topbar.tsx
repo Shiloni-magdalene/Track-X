@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, LogOut, Search, User as UserIcon } from "lucide-react";
+import { Bell, LogOut, Search, User as UserIcon, CalendarDays, AlertCircle } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "./theme-toggle";
 import { supabase } from "@/integrations/supabase/client";
+
+type Notif = { id: string; title: string; sub: string; daysLeft: number; kind: "exam" | "deadline" };
 
 export function AppTopbar({ user }: { user: User | null }) {
   const navigate = useNavigate();
