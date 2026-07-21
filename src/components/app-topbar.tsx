@@ -25,6 +25,34 @@ type Notif = { id: string; title: string; sub: string; daysLeft: number; kind: "
 export function AppTopbar({ user }: { user: User | null }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [notifs, setNotifs] = useState<Notif[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    void (async () => {
+      const [examRes, projRes] = await Promise.all([
+        supabase.from("exams").select("id, type, date, subjects(name)"),
+        supabase.from("projects").select("id, name, deadline, status"),
+      ]);
+      const now = Date.now();
+      const daysFrom = (d: string) => Math.ceil((new Date(d).getTime() - now) / 86400000);
+      const list: Notif[] = [];
+      for (const e of (examRes.data ?? []) as any[]) {
+        if (!e.date) continue;
+        const dl = daysFrom(e.date);
+        if (dl < 0 || dl > 14) continue;
+        list.push({ id: `e-${e.id}`, kind: "exam", title: e.subjects?.name || "Exam", sub: e.type || "Exam", daysLeft: dl });
+      }
+      for (const p of (projRes.data ?? []) as any[]) {
+        if (!p.deadline || p.status === "completed") continue;
+        const dl = daysFrom(p.deadline);
+        if (dl < 0 || dl > 14) continue;
+        list.push({ id: `p-${p.id}`, kind: "deadline", title: p.name, sub: "Project deadline", daysLeft: dl });
+      }
+      list.sort((a, b) => a.daysLeft - b.daysLeft);
+      setNotifs(list);
+    })();
+  }, [user]);
 
   const name =
     (user?.user_metadata?.name as string | undefined) ??
