@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, LogOut, Search, Settings, User as UserIcon, CalendarDays, AlertCircle, Linkedin } from "lucide-react";
+import { Bell, LogOut, Search, Settings, Sparkles, User as UserIcon, CalendarDays, AlertCircle, Linkedin } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
@@ -151,11 +151,20 @@ export function AppTopbar({ user }: { user: User | null }) {
           placeholder="Search subjects, skills, projects…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-9"
+          className="h-9 rounded-md border-border/70 bg-muted/40 pl-9 shadow-none focus-visible:bg-background"
         />
       </div>
 
       <div className="ml-auto flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          className="hidden h-9 gap-1.5 rounded-md border-border/70 bg-card px-3 text-xs font-medium shadow-xs md:inline-flex"
+          onClick={() => navigate({ to: "/ai-assistant" })}
+        >
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
+          Ask AI
+        </Button>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
