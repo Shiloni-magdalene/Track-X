@@ -1,65 +1,51 @@
-# Phase 3 — Dashboard Command Center
+# Premium SaaS Redesign Plan
 
-Rebuild `src/routes/_authenticated/dashboard.tsx` as a modern, responsive command center with placeholder data matching the schema in `src/lib/types.ts`. No backend wiring yet — pure UI with static seed data.
+Goal: elevate the app to Linear/Vercel/Stripe-tier polish. **No backend, DB, server function, or AI logic changes.** Every module keeps its current data flow, CRUD, and Supabase queries. Only markup, styling, layout, motion, and small presentational components change.
 
-## Dependencies
+Because this touches ~15 pages, I'll do it in **4 sequenced passes** so you can review after each — not one giant rewrite.
 
-- Add `recharts` via `bun add recharts` (not currently installed).
-- Reuse existing Shadcn primitives: Card, Progress, Badge, Checkbox, Separator, Avatar. Install any missing ones via shadcn CLI if needed (likely `checkbox`, `badge` — verify first).
+## Pass 1 — Design system foundation (this turn)
+Everything below is presentation-only.
 
-## Layout
+**Tokens (`src/styles.css`)**
+- Rebuild palette on the exact hexes you gave: primary `#2563EB`, accent `#7C3AED`, success `#22C55E`, warning `#F59E0B`, danger `#EF4444`, refined neutral scale for light + dark.
+- Tighter radii scale, softer elevation shadows (`--shadow-xs/sm/md/lg`), 8-pt spacing already native to Tailwind.
+- Replace the loud brand gradient + glow with a restrained variant used sparingly.
+- Add `--font-sans` (Inter) loaded via `<link>` in `__root.tsx` head.
 
-Single file, mobile-first grid inside the existing `<main>` from `_authenticated/route.tsx`:
+**Primitives**
+- `PageHeader` (title, description, actions slot) — used on every module for consistent hierarchy.
+- `StatCard`, `SectionCard` wrappers with unified padding, hover lift, border treatment.
+- `EmptyState` (icon, title, description, CTA) — replaces every ad-hoc empty block.
+- `Skeleton` presets for cards / rows / charts.
+- Motion helpers using existing `tw-animate-css` (no new deps) — subtle fade/slide-up on mount, hover lift on cards.
 
-```text
-┌──────────────────────────────────────────────────────┐
-│ Welcome hero (kept, condensed)                       │
-├──────────┬──────────┬──────────┬──────────┐          │
-│ Academic │ Placement│  Coding  │ Aptitude │  Row 1   │
-│ Circular │ Circular │  Streak  │ Accuracy │          │
-├──────────┴──────────┼──────────┴──────────┐          │
-│ Weekly Goals (Bar)  │ Today's Tasks       │  Row 2   │
-│ (lg:col-span-2)     │ (checkboxes)        │          │
-│                     ├─────────────────────┤          │
-│                     │ Recent Activity     │          │
-├─────────────────────┴─────────────────────┤          │
-│ Upcoming Deadlines │ Upcoming Exams       │  Row 3   │
-└────────────────────┴──────────────────────┘          │
-```
+**Shell**
+- Sidebar: grouped sections (Study, Placement, Tools), refined active indicator (left accent bar + subtle bg), smoother collapse, better icon spacing.
+- Topbar: sticky, refined search input, quick-AI button (opens `/ai-assistant`), profile menu, theme toggle, notifications — all with consistent icon-button sizing.
 
-Grid: `grid gap-4 sm:grid-cols-2 lg:grid-cols-4` for Row 1; `lg:grid-cols-3` for Row 2 (bar chart spans 2, right column stacks Tasks + Activity); `lg:grid-cols-2` for Row 3.
+## Pass 2 — Dashboard + AI Assistant
+- Dashboard: executive command-center grid — welcome header, AI insight card, radial progress rings for the 4 KPIs, weekly goals area chart, upcoming deadlines/exams list, activity timeline, calendar preview. Skeleton loading, empty states.
+- AI Assistant: ChatGPT-style layout — centered column, message bubbles with avatars, timestamps, markdown + syntax-highlighted code (add `react-syntax-highlighter`), copy button per assistant message, regenerate, refined suggested prompts, auto-scroll, skeleton while thinking. **Backend server fn untouched.**
 
-## Row 1 — Quick Stats
+## Pass 3 — Data-heavy modules
+Academics, Exams, Aptitude, Coding, Placements, Projects.
+- Consistent `PageHeader` + primary action.
+- Cards → unified surface; tables get sticky headers, hover rows, search/filter where already applicable.
+- Dialogs restyled with consistent form spacing, inline validation styling, better date/select controls.
+- Empty states + skeletons everywhere.
 
-Circular progress via lightweight inline SVG component (`CircularProgress` — stroke-dasharray on an SVG circle, uses `--primary` and `--muted`). Two circular cards: **Academic Progress** (68%), **Placement Readiness** (54%). Two numeric cards: **Coding Streak** (12 days, flame icon, `--warning` accent), **Aptitude Accuracy** (76%, `--success` accent, tiny sparkline optional — skip for now).
+## Pass 4 — Auth, notifications, polish
+- Auth page: split-screen premium layout, refined form.
+- Notifications popover: grouped by type, unread dot, refined empty state.
+- Global sweep: focus rings, ARIA labels on icon buttons, responsive audit at 375/768/1280, remove any remaining hardcoded colors.
 
-## Row 2
+## Explicit non-goals
+- No schema, RLS, server function, or AI prompt changes.
+- No new heavy deps beyond `react-syntax-highlighter` (Pass 2) and Inter font.
+- No Framer Motion — using existing `tw-animate-css` + Tailwind transitions keeps bundle lean and matches the "subtle, professional" brief. If you specifically want Framer Motion I'll add it in Pass 2.
 
-- **Weekly Goals Progress** — Recharts `<BarChart>` with 7 days (Mon–Sun), two series: `planned` vs `completed` (hours). Colors from `--chart-1` / `--chart-2`. Rounded bars, no grid lines except subtle horizontal, custom tooltip using card token colors.
-- **Today's Tasks** — 4–5 items with Shadcn `<Checkbox>`, strike-through on check (local state), each with a small category badge (Academics / Coding / Aptitude).
-- **Recent Activity** — vertical timeline (5 entries): dot + line via CSS, icon per event type (solved LeetCode, submitted assignment, mock test, certificate added, LinkedIn post). Relative timestamps ("2h ago").
+## What I'll do right now if you approve
+Pass 1 only: tokens, primitives, sidebar, topbar. You'll see the whole app instantly feel more consistent, then we move to Pass 2.
 
-## Row 3 — Alerts
-
-- **Upcoming Deadlines** — list of 3–4 items from `projects`/`subjects` shape (name, due date, urgency badge: red ≤2 days, amber ≤7, muted otherwise).
-- **Upcoming Exams** — list from `exams` shape (subject, type badge — CAT/Unit Test/EndSem, date, days-left urgency badge).
-
-Both use `<div>` rows with hover `bg-accent/50` transition.
-
-## Placeholder data
-
-A single `dashboardMockData` object at top of the file, typed against `Project`, `Exam`, `Subject` from `@/lib/types.ts` (partial where fine). Keeps future swap to Supabase queries trivial.
-
-## Polish
-
-- All cards: `transition-all hover:shadow-md hover:-translate-y-0.5` for subtle lift.
-- Use only semantic tokens (`bg-card`, `text-muted-foreground`, `border`, `--chart-*`) — no hardcoded colors, works in dark mode.
-- Icons from `lucide-react` (Flame, Target, CheckCircle2, Clock, AlertCircle, CalendarDays, Trophy, Code2, Brain, etc.).
-- Fully responsive: stat cards stack on mobile, chart full-width, side column drops below on <lg.
-
-## Files touched
-
-- `src/routes/_authenticated/dashboard.tsx` — full rewrite.
-- `package.json` / lockfile — via `bun add recharts` (+ shadcn checkbox/badge if missing).
-
-Not touched: routing, auth, database, other routes.
+Reply "go" (or "go, use framer motion") to start Pass 1, or tell me to reorder/skip passes.
