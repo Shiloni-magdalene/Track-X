@@ -9,6 +9,7 @@ import {
   FolderKanban,
   Sparkles,
   GraduationCap,
+  Star,
 } from "lucide-react";
 
 import {
@@ -46,7 +47,10 @@ const groups = [
   },
   {
     label: "Tools",
-    items: [{ title: "AI Assistant", url: "/ai-assistant", icon: Sparkles }],
+    items: [
+      { title: "AI Assistant", url: "/ai-assistant", icon: Sparkles },
+      { title: "Daily Growth Hub", url: "/daily-growth", icon: Star },
+    ],
   },
 ] as const;
 

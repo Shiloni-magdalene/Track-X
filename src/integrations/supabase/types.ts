@@ -214,6 +214,63 @@ export type Database = {
           },
         ]
       }
+      growth_completions: {
+        Row: {
+          completed_date: string
+          created_at: string
+          id: string
+          quiz_score: number | null
+          quiz_total: number | null
+          track: string
+          user_id: string
+        }
+        Insert: {
+          completed_date?: string
+          created_at?: string
+          id?: string
+          quiz_score?: number | null
+          quiz_total?: number | null
+          track: string
+          user_id: string
+        }
+        Update: {
+          completed_date?: string
+          created_at?: string
+          id?: string
+          quiz_score?: number | null
+          quiz_total?: number | null
+          track?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      growth_progress: {
+        Row: {
+          created_at: string
+          last_completed_date: string | null
+          streak: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          last_completed_date?: string | null
+          streak?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          last_completed_date?: string | null
+          streak?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       leetcode: {
         Row: {
           created_at: string

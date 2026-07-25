@@ -16,6 +16,7 @@ import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPlacementsRouteImport } from './routes/_authenticated/placements'
 import { Route as AuthenticatedExamsRouteImport } from './routes/_authenticated/exams'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDailyGrowthRouteImport } from './routes/_authenticated/daily-growth'
 import { Route as AuthenticatedCodingRouteImport } from './routes/_authenticated/coding'
 import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticated/aptitude'
 import { Route as AuthenticatedAiAssistantRouteImport } from './routes/_authenticated/ai-assistant'
@@ -55,6 +56,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDailyGrowthRoute =
+  AuthenticatedDailyGrowthRouteImport.update({
+    id: '/daily-growth',
+    path: '/daily-growth',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCodingRoute = AuthenticatedCodingRouteImport.update({
   id: '/coding',
   path: '/coding',
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/ai-assistant': typeof AuthenticatedAiAssistantRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
   '/coding': typeof AuthenticatedCodingRoute
+  '/daily-growth': typeof AuthenticatedDailyGrowthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exams': typeof AuthenticatedExamsRoute
   '/placements': typeof AuthenticatedPlacementsRoute
@@ -96,6 +104,7 @@ export interface FileRoutesByTo {
   '/ai-assistant': typeof AuthenticatedAiAssistantRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
   '/coding': typeof AuthenticatedCodingRoute
+  '/daily-growth': typeof AuthenticatedDailyGrowthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exams': typeof AuthenticatedExamsRoute
   '/placements': typeof AuthenticatedPlacementsRoute
@@ -110,6 +119,7 @@ export interface FileRoutesById {
   '/_authenticated/ai-assistant': typeof AuthenticatedAiAssistantRoute
   '/_authenticated/aptitude': typeof AuthenticatedAptitudeRoute
   '/_authenticated/coding': typeof AuthenticatedCodingRoute
+  '/_authenticated/daily-growth': typeof AuthenticatedDailyGrowthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exams': typeof AuthenticatedExamsRoute
   '/_authenticated/placements': typeof AuthenticatedPlacementsRoute
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/aptitude'
     | '/coding'
+    | '/daily-growth'
     | '/dashboard'
     | '/exams'
     | '/placements'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/aptitude'
     | '/coding'
+    | '/daily-growth'
     | '/dashboard'
     | '/exams'
     | '/placements'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ai-assistant'
     | '/_authenticated/aptitude'
     | '/_authenticated/coding'
+    | '/_authenticated/daily-growth'
     | '/_authenticated/dashboard'
     | '/_authenticated/exams'
     | '/_authenticated/placements'
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/daily-growth': {
+      id: '/_authenticated/daily-growth'
+      path: '/daily-growth'
+      fullPath: '/daily-growth'
+      preLoaderRoute: typeof AuthenticatedDailyGrowthRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding': {
       id: '/_authenticated/coding'
       path: '/coding'
@@ -248,6 +268,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiAssistantRoute: typeof AuthenticatedAiAssistantRoute
   AuthenticatedAptitudeRoute: typeof AuthenticatedAptitudeRoute
   AuthenticatedCodingRoute: typeof AuthenticatedCodingRoute
+  AuthenticatedDailyGrowthRoute: typeof AuthenticatedDailyGrowthRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExamsRoute: typeof AuthenticatedExamsRoute
   AuthenticatedPlacementsRoute: typeof AuthenticatedPlacementsRoute
@@ -259,6 +280,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiAssistantRoute: AuthenticatedAiAssistantRoute,
   AuthenticatedAptitudeRoute: AuthenticatedAptitudeRoute,
   AuthenticatedCodingRoute: AuthenticatedCodingRoute,
+  AuthenticatedDailyGrowthRoute: AuthenticatedDailyGrowthRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExamsRoute: AuthenticatedExamsRoute,
   AuthenticatedPlacementsRoute: AuthenticatedPlacementsRoute,
