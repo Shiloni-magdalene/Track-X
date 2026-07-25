@@ -49,7 +49,7 @@ function daysBetween(a: string, b: string) {
 }
 
 function DailyGrowthHub() {
-  const [progress, setProgress] = useState<Progress>({ xp: 0, streak: 0, last_completed_date: null });
+  const [progress, setProgress] = useState<ProgressRow>({ xp: 0, streak: 0, last_completed_date: null });
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [activeTrack, setActiveTrack] = useState<Track["id"]>(TRACKS[0].id);
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
