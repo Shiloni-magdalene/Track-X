@@ -33,8 +33,8 @@ export const generateGrowthQuiz = createServerFn({ method: "POST" })
       .filter((l: { revision_needed?: boolean | null }) => l.revision_needed)
       .map((l: { topic?: string | null }) => l.topic)
       .filter(Boolean);
-    const weakExamTopics = (exams.data ?? [])
-      .flatMap((e: { weak_topics?: string[] | null }) => e.weak_topics ?? []);
+    const weakExamTopics = ((exams.data ?? []) as Array<{ weak_topics?: unknown }>)
+      .flatMap((e) => (Array.isArray(e.weak_topics) ? (e.weak_topics as string[]) : []));
     const weakSkills = (skills.data ?? [])
       .filter((s: { confidence?: number | null }) => (s.confidence ?? 0) < 60)
       .map((s: { name: string }) => s.name);
