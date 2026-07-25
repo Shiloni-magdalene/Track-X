@@ -75,7 +75,7 @@ function DailyGrowthHub() {
       supabase.from("profiles").select("overall_placement_readiness").eq("id", uid).maybeSingle(),
       supabase.from("leetcode").select("solved_date").eq("user_id", uid).order("solved_date", { ascending: false }).limit(1),
     ]);
-    if (prog.data) setProgress(prog.data as unknown as Progress);
+    if (prog.data) setProgress(prog.data as unknown as ProgressRow);
     setCompletions(((comps.data as unknown) as Completion[]) ?? []);
     setRecommendation(computeRecommendation({
       exams: (exams.data ?? []) as Array<{ date: string | null }>,
