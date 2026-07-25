@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/daily-growth")({
   component: DailyGrowthHub,
 });
 
-type Progress = {
+type ProgressRow = {
   xp: number;
   streak: number;
   last_completed_date: string | null;
