@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ojheniliuoqtynttibsm.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "academic-ai",
+      "version": "0.1.0",
+      "title": "Academic AI"
+    },
+    "tools": [
+      {
+        "name": "get_academic_overview",
+        "title": "Get academic overview",
+        "description": "Summarize the signed-in student's academic and placement data: subjects, upcoming exams, projects, skills, aptitude topics and coding progress.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_upcoming_exams",
+        "title": "List upcoming exams",
+        "description": "List the student's exams scheduled within the next N days, including marks targets and syllabus coverage.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "number",
+              "description": "Look-ahead window in days. Defaults to 30."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_projects",
+        "title": "List projects",
+        "description": "List the signed-in student's tracked projects with status, deadline and documentation progress.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Optional status filter, e.g. planned, in-progress, completed."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_project",
+        "title": "Create project",
+        "description": "Add a new project to the signed-in student's project tracker.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Project name."
+            },
+            "status": {
+              "type": "string",
+              "description": "Status, e.g. planned, in-progress, completed."
+            },
+            "deadline": {
+              "type": "string",
+              "description": "Deadline as an ISO date (YYYY-MM-DD)."
+            },
+            "github_link": {
+              "type": "string",
+              "description": "GitHub repository URL."
+            },
+            "doc_progress": {
+              "type": "number",
+              "description": "Documentation progress percentage, 0-100."
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_project",
+        "title": "Update project",
+        "description": "Update the status, deadline or documentation progress of one of the student's projects.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Project id."
+            },
+            "status": {
+              "type": "string",
+              "description": "New status, e.g. planned, in-progress, completed."
+            },
+            "deadline": {
+              "type": "string",
+              "description": "New deadline as an ISO date (YYYY-MM-DD)."
+            },
+            "doc_progress": {
+              "type": "number",
+              "description": "Documentation progress percentage, 0-100."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "log_leetcode_problem",
+        "title": "Log a solved coding problem",
+        "description": "Record a solved coding/LeetCode problem in the student's coding tracker.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "problem_name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Problem name."
+            },
+            "difficulty": {
+              "type": "string",
+              "description": "Easy, Medium or Hard."
+            },
+            "topic": {
+              "type": "string",
+              "description": "Topic, e.g. arrays, graphs, dp."
+            },
+            "notes": {
+              "type": "string",
+              "description": "Short notes about the approach."
+            },
+            "revision_needed": {
+              "type": "boolean",
+              "description": "Whether this problem needs revision later."
+            },
+            "solved_date": {
+              "type": "string",
+              "description": "Solved date as an ISO date (YYYY-MM-DD)."
+            }
+          },
+          "required": [
+            "problem_name"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
