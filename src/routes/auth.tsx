@@ -13,6 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" && s.next.startsWith("/") && !s.next.startsWith("//") ? s.next : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign in — Scholar OS" },
@@ -24,6 +27,8 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const afterAuth = next ?? "/dashboard";
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,13 +37,13 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) navigate({ to: afterAuth, replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) navigate({ to: "/dashboard", replace: true });
+      if (event === "SIGNED_IN" && session) navigate({ to: afterAuth, replace: true });
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, afterAuth]);
 
   const handleEmailAuth = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,7 +54,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${afterAuth}`,
             data: { name },
           },
         });
@@ -69,7 +74,7 @@ function AuthPage() {
   const handleGoogle = async () => {
     setLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}${afterAuth}`,
     });
     if (result.error) {
       toast.error(result.error.message || "Google sign-in failed");
