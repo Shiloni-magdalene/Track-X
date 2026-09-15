@@ -27,7 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export const Route = createFileRoute("/_authenticated/exams")({
-  head: () => ({ meta: [{ title: "Exams — Scholar OS" }] }),
+  head: () => ({ meta: [{ title: "Exams — Aria" }] }),
   component: ExamsPage,
 });
 
