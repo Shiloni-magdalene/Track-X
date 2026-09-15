@@ -26,7 +26,7 @@ import { TRACKS, levelFromXp, type QuizQuestion, type Track } from "@/lib/growth
 import { generateGrowthQuiz } from "@/lib/growth-ai.functions";
 
 export const Route = createFileRoute("/_authenticated/daily-growth")({
-  head: () => ({ meta: [{ title: "Daily Growth Hub — Scholar OS" }] }),
+  head: () => ({ meta: [{ title: "Daily Growth Hub — Aria" }] }),
   component: DailyGrowthHub,
 });
 
