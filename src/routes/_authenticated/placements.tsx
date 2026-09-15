@@ -25,7 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/placements")({
-  head: () => ({ meta: [{ title: "Placements — Scholar OS" }] }),
+  head: () => ({ meta: [{ title: "Placements — Track-X" }] }),
   component: PlacementsPage,
 });
 

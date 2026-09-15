@@ -23,7 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/aptitude")({
-  head: () => ({ meta: [{ title: "Aptitude — Scholar OS" }] }),
+  head: () => ({ meta: [{ title: "Aptitude — Track-X" }] }),
   component: AptitudePage,
 });
 

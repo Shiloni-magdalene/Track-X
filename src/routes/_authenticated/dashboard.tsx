@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Scholar OS" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Track-X" }] }),
   component: Dashboard,
 });
 

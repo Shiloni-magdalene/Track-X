@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/projects")({
-  head: () => ({ meta: [{ title: "Projects — Scholar OS" }] }),
+  head: () => ({ meta: [{ title: "Projects — Track-X" }] }),
   component: ProjectsPage,
 });
 
@@ -151,7 +151,7 @@ function ProjectDialog({
             <Input
               id="name" value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="e.g. Scholar OS" required
+              placeholder="e.g. Track-X" required
             />
           </div>
 
