@@ -25,7 +25,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/coding")({
-  head: () => ({ meta: [{ title: "Coding — Gradus" }] }),
+  head: () => ({ meta: [{ title: "Coding — Scholar OS" }] }),
   component: CodingPage,
 });
 

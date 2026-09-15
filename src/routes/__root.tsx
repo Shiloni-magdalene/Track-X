@@ -80,14 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Gradus — Student Academic & Placement Tracker" },
+      { title: "Scholar OS — Student Academic & Placement Tracker" },
       {
         name: "description",
         content:
           "Track academics, exams, aptitude, coding, projects and placement readiness with an AI-powered study companion.",
       },
-      { name: "author", content: "Gradus" },
-      { property: "og:title", content: "Gradus — Academic & Placement Tracker" },
+      { name: "author", content: "Scholar OS" },
+      { property: "og:title", content: "Scholar OS — Academic & Placement Tracker" },
       {
         property: "og:description",
         content: "Your AI-powered academic and placement companion.",

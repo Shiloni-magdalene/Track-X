@@ -65,7 +65,7 @@ export function AppSidebar() {
             <GraduationCap className="h-4.5 w-4.5" />
           </div>
           <div className="flex min-w-0 flex-col leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="truncate text-sm font-semibold tracking-tight">Gradus</span>
+            <span className="truncate text-sm font-semibold tracking-tight">Scholar OS</span>
             <span className="truncate text-[11px] text-muted-foreground">
               Academic & Placement
             </span>
