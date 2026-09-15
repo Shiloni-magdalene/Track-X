@@ -18,7 +18,7 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in — Aria" },
+      { title: "Sign in — Scholar OS" },
       { name: "description", content: "Sign in to your Student Academic & Placement Tracker." },
     ],
   }),
@@ -90,7 +90,7 @@ function AuthPage() {
           <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-brand text-primary-foreground shadow-glow">
             <GraduationCap className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Aria</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Scholar OS</h1>
           <p className="text-sm text-muted-foreground">
             Your AI-powered academic &amp; placement companion
           </p>

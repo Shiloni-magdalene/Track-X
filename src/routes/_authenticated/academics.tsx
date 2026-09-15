@@ -26,7 +26,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/academics")({
-  head: () => ({ meta: [{ title: "Academics — Aria" }] }),
+  head: () => ({ meta: [{ title: "Academics — Scholar OS" }] }),
   component: AcademicsPage,
 });
 
