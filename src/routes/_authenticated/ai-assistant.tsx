@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/ai-assistant")({
-  head: () => ({ meta: [{ title: "AI Assistant — Scholar OS" }] }),
+  head: () => ({ meta: [{ title: "AI Assistant — Gradus" }] }),
   component: AIAssistant,
 });
 
